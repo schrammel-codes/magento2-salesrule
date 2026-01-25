@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="adminhtml.block.promo.quote.grid">
+            <block class="Magento\Backend\Block\Widget\Grid\Massaction" name="adminhtml.promo.quote.grid.massaction" as="grid.massaction">
+                <arguments>
+                    <argument name="massaction_id_field" xsi:type="string">rule_id</argument>
+                    <argument name="form_field_name" xsi:type="string">ids</argument>
+                    <argument name="use_select_all" xsi:type="string">1</argument>
+                    <argument name="options" xsi:type="array">
+                        <item name="duplicate" xsi:type="array">
+                            <item name="label" xsi:type="string" translate="true">Duplicate</item>
+                            <item name="url" xsi:type="string">schrammelcodes_salesrule/promo_quote/massDuplicate</item>
+                        </item>
+                        <item name="delete" xsi:type="array">
+                            <item name="label" xsi:type="string" translate="true">Delete</item>
+                            <item name="url" xsi:type="string">schrammelcodes_salesrule/promo_quote/massDelete</item>
+                            <item name="confirm" xsi:type="string" translate="true">Are you sure you want to delete the selected rules?</item>
+                        </item>
+                        <item name="status" xsi:type="array">
+                            <item name="label" xsi:type="string" translate="true">Change Status</item>
+                            <item name="url" xsi:type="string">schrammelcodes_salesrule/promo_quote/massStatus</item>
+                            <item name="block_name" xsi:type="string">status</item>
+                        </item>
+                    </argument>
+                </arguments>
+                <block class="Magento\Backend\Block\Widget\Grid\Massaction\Additional" name="adminhtml.promo.quote.grid.massaction.status.additional" as="status">
+                    <arguments>
+                        <argument name="fields" xsi:type="array">
+                            <item name="visibility" xsi:type="array">
+                                <item name="name" xsi:type="string">status</item>
+                                <item name="type" xsi:type="string">select</item>
+                                <item name="class" xsi:type="string">required-entry</item>
+                                <item name="label" xsi:type="string" translate="true">Status</item>
+                                <item name="values" xsi:type="array">
+                                    <item name="enable" xsi:type="array">
+                                        <item name="value" xsi:type="string">1</item>
+                                        <item name="label" xsi:type="string" translate="true">Enabled</item>
+                                    </item>
+                                    <item name="disable" xsi:type="array">
+                                        <item name="value" xsi:type="string">0</item>
+                                        <item name="label" xsi:type="string" translate="true">Disabled</item>
+                                    </item>
+                                </item>
+                            </item>
+                        </argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceBlock>
+
+        <referenceBlock name="adminhtml.promo.quote.grid.columnSet">
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.action" as="action">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Action</argument>
+                    <argument name="type" xsi:type="string">action</argument>
+                    <argument name="getter" xsi:type="string">getId</argument>
+                    <argument name="filter" xsi:type="string">0</argument>
+                    <argument name="sortable" xsi:type="string">0</argument>
+                    <argument name="index" xsi:type="string">stores</argument>
+                    <argument name="is_system" xsi:type="string">1</argument>
+                    <argument name="actions" xsi:type="array">
+                        <item name="edit" xsi:type="array">
+                            <item name="caption" xsi:type="string" translate="true">Edit</item>
+                            <item name="url" xsi:type="array">
+                                <item name="base" xsi:type="string">sales_rule/promo_quote/edit</item>
+                            </item>
+                            <item name="field" xsi:type="string">id</item>
+                        </item>
+                        <item name="duplicate" xsi:type="array">
+                            <item name="caption" xsi:type="string" translate="true">Duplicate</item>
+                            <item name="url" xsi:type="array">
+                                <item name="base" xsi:type="string">schrammelcodes_salesrule/promo_quote/duplicate</item>
+                            </item>
+                            <item name="field" xsi:type="string">id</item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>
