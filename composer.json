@@ -1,0 +1,25 @@
+{
+    "name": "schrammel-codes/magento2-salesrule",
+    "description": "Adds duplicate functionality and mass actions to Cart Price Rules",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "MIT"
+    ],
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0",
+        "magento/module-sales-rule": "*",
+        "magento/framework": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "SchrammelCodes\\SalesRule\\": ""
+        }
+    },
+    "suggest": {
+        "schrammel-codes/magento2-salesrule-commerce": "Ensures proper reset of staged rule data in Adobe Commerce installations"
+    }
+}
