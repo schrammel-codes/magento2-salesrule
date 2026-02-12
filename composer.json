@@ -2,7 +2,7 @@
     "name": "schrammel-codes/magento2-salesrule",
     "description": "Adds duplicate functionality and mass actions to Cart Price Rules",
     "type": "magento2-module",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "license": [
         "MIT"
     ],
