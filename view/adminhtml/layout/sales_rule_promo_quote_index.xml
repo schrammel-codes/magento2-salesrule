@@ -50,7 +50,55 @@
         </referenceBlock>
 
         <referenceBlock name="adminhtml.promo.quote.grid.columnSet">
-            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.action" as="action">
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.rule_action" as="rule_action" after="adminhtml.promo.quote.grid.columnSet.rule_website">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Rule Type</argument>
+                    <argument name="index" xsi:type="string">simple_action</argument>
+                    <argument name="type" xsi:type="string">options</argument>
+                    <argument name="options" xsi:type="array">
+                        <item name="by_percent" xsi:type="array">
+                            <item name="value" xsi:type="string">by_percent</item>
+                            <item name="label" xsi:type="string" translate="true">Percent of product price discount</item>
+                        </item>
+                        <item name="by_fixed" xsi:type="array">
+                            <item name="value" xsi:type="string">by_fixed</item>
+                            <item name="label" xsi:type="string" translate="true">Fixed amount discount</item>
+                        </item>
+                        <item name="cart_fixed" xsi:type="array">
+                            <item name="value" xsi:type="string">cart_fixed</item>
+                            <item name="label" xsi:type="string" translate="true">Fixed amount discount for whole cart</item>
+                        </item>
+                        <item name="buy_x_get_y" xsi:type="array">
+                            <item name="value" xsi:type="string">buy_x_get_y</item>
+                            <item name="label" xsi:type="string" translate="true">Buy X and get Y free (discount amount is Y)</item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.amount" as="amount" after="adminhtml.promo.quote.grid.columnSet.rule_action">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Discount Amount</argument>
+                    <argument name="index" xsi:type="string">discount_amount</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.stop" as="stop" after="adminhtml.promo.quote.grid.columnSet.amount">
+                <arguments>
+                    <argument name="header" xsi:type="string" translate="true">Stop Rule</argument>
+                    <argument name="index" xsi:type="string">stop_rules_processing</argument>
+                    <argument name="type" xsi:type="string">options</argument>
+                    <argument name="options" xsi:type="array">
+                        <item name="active" xsi:type="array">
+                            <item name="value" xsi:type="string">0</item>
+                            <item name="label" xsi:type="string" translate="true">No</item>
+                        </item>
+                        <item name="inactive" xsi:type="array">
+                            <item name="value" xsi:type="string">1</item>
+                            <item name="label" xsi:type="string" translate="true">Yes</item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Backend\Block\Widget\Grid\Column" name="adminhtml.promo.quote.grid.columnSet.action" as="action" after="adminhtml.promo.quote.grid.columnSet.stop">
                 <arguments>
                     <argument name="header" xsi:type="string" translate="true">Action</argument>
                     <argument name="type" xsi:type="string">action</argument>
