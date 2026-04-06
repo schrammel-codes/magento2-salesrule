@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace SchrammelCodes\SalesRule\Test\Unit\Model;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\RuleFactory;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
@@ -214,7 +215,7 @@ class RuleDuplicatorTest extends TestCase
 
     public function testDuplicateSkipsWebsiteIdsWhenDisabled(): void
     {
-        $ruleDuplicator = $this->getRuleDuplicator([], false);
+        $ruleDuplicator = $this->getRuleDuplicator(shouldCopyWebsiteIds: false);
 
         $originalRule = $this->createOriginalRule();
         $newRule = $this->createNewRule();
@@ -248,7 +249,7 @@ class RuleDuplicatorTest extends TestCase
 
     public function testDuplicateSkipsCustomerGroupIdsWhenDisabled(): void
     {
-        $ruleDuplicator = $this->getRuleDuplicator([], true, false);
+        $ruleDuplicator = $this->getRuleDuplicator(shouldCopyCustomerGroupIds: false);
 
         $originalRule = $this->createOriginalRule();
         $newRule = $this->createNewRule();
@@ -282,7 +283,7 @@ class RuleDuplicatorTest extends TestCase
 
     public function testDuplicateSkipsStoreLabelsWhenDisabled(): void
     {
-        $ruleDuplicator = $this->getRuleDuplicator([], true, true, false);
+        $ruleDuplicator = $this->getRuleDuplicator(shouldCopyStoreLabels: false);
 
         $originalRule = $this->createOriginalRule();
         $newRule = $this->createNewRule();
@@ -348,13 +349,7 @@ class RuleDuplicatorTest extends TestCase
 
     public function testDuplicateSetsIsActiveToZeroWhenStatusIsDisabled(): void
     {
-        $ruleDuplicator = $this->getRuleDuplicator(
-            [],
-            true,
-            true,
-            true,
-            DuplicateActiveStatus::DISABLED
-        );
+        $ruleDuplicator = $this->getRuleDuplicator(duplicateActiveStatus: DuplicateActiveStatus::DISABLED);
 
         $originalRule = $this->createOriginalRule();
         $newRule = $this->createNewRule();
@@ -379,13 +374,7 @@ class RuleDuplicatorTest extends TestCase
 
     public function testDuplicateSetsIsActiveToOneWhenStatusIsEnabled(): void
     {
-        $ruleDuplicator = $this->getRuleDuplicator(
-            [],
-            true,
-            true,
-            true,
-            DuplicateActiveStatus::ENABLED
-        );
+        $ruleDuplicator = $this->getRuleDuplicator(duplicateActiveStatus: DuplicateActiveStatus::ENABLED);
 
         $originalRule = $this->createOriginalRule(['is_active' => 0]);
         $newRule = $this->createNewRule();
@@ -532,12 +521,107 @@ class RuleDuplicatorTest extends TestCase
         $this->assertNull($capturedData['reset_field']);
     }
 
+    public function testDuplicateResetsStagingFieldsWhenStagingModuleIsEnabled(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator(stagingEnabled: true);
+
+        $originalRule = $this->createOriginalRule(['row_id' => 42]);
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+
+        $capturedData = null;
+        $newRule->expects($this->once())
+            ->method('setData')
+            ->willReturnCallback(function ($data) use (&$capturedData, $newRule) {
+                $capturedData = $data;
+
+                return $newRule;
+            });
+
+        $ruleDuplicator->duplicate($originalRule);
+
+        $this->assertEquals(1, $capturedData['created_in']);
+        $this->assertEquals(2147483647, $capturedData['updated_in']);
+        $this->assertNull($capturedData['deactivated_in']);
+        $this->assertArrayNotHasKey('row_id', $capturedData);
+    }
+
+    public function testDuplicateDoesNotResetStagingFieldsWhenStagingModuleIsDisabled(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator();
+
+        $originalRule = $this->createOriginalRule(['row_id' => 42, 'created_in' => 5, 'updated_in' => 100]);
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+
+        $capturedData = null;
+        $newRule->expects($this->once())
+            ->method('setData')
+            ->willReturnCallback(function ($data) use (&$capturedData, $newRule) {
+                $capturedData = $data;
+
+                return $newRule;
+            });
+
+        $ruleDuplicator->duplicate($originalRule);
+
+        // Values from the original rule must not be overwritten by staging logic
+        $this->assertEquals(42, $capturedData['row_id']);
+        $this->assertEquals(5, $capturedData['created_in']);
+        $this->assertEquals(100, $capturedData['updated_in']);
+    }
+
+    public function testDuplicateSavesStoreLabelsWithLinkFieldWhenStagingModuleIsEnabled(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator(stagingEnabled: true);
+
+        $originalRule = $this->createOriginalRule();
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+        $this->ruleResource->method('getLinkField')->willReturn('row_id');
+
+        $newRule->method('getStoreLabels')->willReturn([1 => 'Label 1', 2 => 'Label 2']);
+        $newRule->method('getData')->with('row_id')->willReturn(77);
+
+        $this->ruleResource->expects($this->once())
+            ->method('saveStoreLabels')
+            ->with(77, [1 => 'Label 1', 2 => 'Label 2']);
+
+        $ruleDuplicator->duplicate($originalRule);
+    }
+
+    public function testDuplicateDoesNotSaveStoreLabelsWhenStagingModuleIsDisabled(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator();
+
+        $originalRule = $this->createOriginalRule();
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+
+        $this->ruleResource->expects($this->never())->method('saveStoreLabels');
+
+        $ruleDuplicator->duplicate($originalRule);
+    }
+
     private function getRuleDuplicator(
         array $customFieldResets = [],
         bool $shouldCopyWebsiteIds = true,
         bool $shouldCopyCustomerGroupIds = true,
         bool $shouldCopyStoreLabels = true,
-        int $duplicateActiveStatus = DuplicateActiveStatus::KEEP
+        int $duplicateActiveStatus = DuplicateActiveStatus::KEEP,
+        bool $stagingEnabled = false
     ): RuleDuplicator
     {
         $this->ruleFactory = $this->createMock(RuleFactory::class);
@@ -549,10 +633,16 @@ class RuleDuplicatorTest extends TestCase
         $duplicationConfig->method('shouldCopyStoreLabels')->willReturn($shouldCopyStoreLabels);
         $duplicationConfig->method('getDuplicateActiveStatus')->willReturn($duplicateActiveStatus);
 
+        $moduleManager = $this->createMock(ModuleManager::class);
+        $moduleManager->method('isEnabled')
+            ->with('Magento_SalesRuleStaging')
+            ->willReturn($stagingEnabled);
+
         return new RuleDuplicator(
             $this->ruleFactory,
             $this->ruleResource,
-            $duplicationConfig
+            $duplicationConfig,
+            $moduleManager
         );
     }
 
@@ -589,7 +679,7 @@ class RuleDuplicatorTest extends TestCase
     {
         $rule = $this->getMockBuilder(Rule::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getId', 'setData'])
+            ->onlyMethods(['getId', 'setData', 'getData', 'getStoreLabels'])
             ->addMethods(['setWebsiteIds', 'setCustomerGroupIds', 'setStoreLabels'])
             ->getMock();
 

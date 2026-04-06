@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SchrammelCodes\SalesRule\Model;
 
+use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\RuleFactory;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
@@ -12,10 +13,15 @@ use SchrammelCodes\SalesRule\Model\Config\Source\DuplicateActiveStatus;
 
 class RuleDuplicator implements RuleDuplicatorInterface
 {
+    private const STAGING_MODULE = 'Magento_SalesRuleStaging';
+    private const STAGING_VERSION_MAIN = 1;
+    private const STAGING_VERSION_MAX = 2147483647;
+
     public function __construct(
         private readonly RuleFactory $ruleFactory,
         private readonly RuleResource $ruleResource,
-        private readonly DuplicationConfig $duplicationConfig
+        private readonly DuplicationConfig $duplicationConfig,
+        private readonly ModuleManager $moduleManager
     ) {
     }
 
@@ -32,6 +38,13 @@ class RuleDuplicator implements RuleDuplicatorInterface
         $this->copyRelationships($originalRule, $newRule);
         $this->ruleResource->save($newRule);
         $this->ruleResource->load($newRule, $newRule->getId());
+
+        if ($this->moduleManager->isEnabled(self::STAGING_MODULE) && ($storeLabels = $newRule->getStoreLabels())) {
+            $this->ruleResource->saveStoreLabels(
+                $newRule->getData($this->ruleResource->getLinkField()),
+                $storeLabels
+            );
+        }
 
         return $newRule;
     }
@@ -66,12 +79,14 @@ class RuleDuplicator implements RuleDuplicatorInterface
         $data['times_used'] = 0;
 
         $activeStatus = $this->duplicationConfig->getDuplicateActiveStatus();
-        if ($activeStatus === DuplicateActiveStatus::KEEP) {
-            $data['is_active'] = $originalActiveStatus;
+        $data['is_active'] = $activeStatus === DuplicateActiveStatus::KEEP ? $originalActiveStatus : $activeStatus;
 
-            return;
+        if ($this->moduleManager->isEnabled(self::STAGING_MODULE)) {
+            $data['created_in'] = self::STAGING_VERSION_MAIN;
+            $data['updated_in'] = self::STAGING_VERSION_MAX;
+            $data['deactivated_in'] = null;
+            unset($data['row_id']);
         }
-        $data['is_active'] = $activeStatus;
     }
 
     /**

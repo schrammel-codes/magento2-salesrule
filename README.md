@@ -130,12 +130,10 @@ Grant these permissions to admin roles as needed.
 
 ## Compatibility
 
-- **Magento 2.4.x** (Open Source)
+- **Magento 2.4.x** (Open Source and Adobe Commerce)
 - **PHP 8.1, 8.2, 8.3**
 
-> ### For Magento Commerce installations
-> To ensure proper reset of staging preview data, install the companion module **SchrammelCodes_SalesRuleCommerce**
-> to ensure proper handling of staging fields.
+> **Adobe Commerce note:** When `Magento_SalesRuleStaging` is enabled, staging version fields are automatically reset on duplication — no companion module required.
 
 ## Duplication Configuration
 
@@ -205,5 +203,7 @@ The following fields are unconditionally reset on every duplication and **cannot
 | `to_date` | `NULL` |
 | `coupon_code` | `NULL` |
 | `times_used` | `0` |
+
+> **Adobe Commerce only:** When `Magento_SalesRuleStaging` is active, the fields `created_in`, `updated_in`, and `deactivated_in` are also unconditionally reset to their default staging version values.
 
 ## Technical Information

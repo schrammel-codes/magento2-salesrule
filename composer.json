@@ -18,8 +18,5 @@
         "psr-4": {
             "SchrammelCodes\\SalesRule\\": ""
         }
-    },
-    "suggest": {
-        "schrammel-codes/magento2-salesrule-commerce": "Ensures proper reset of staged rule data in Adobe Commerce installations"
     }
 }
