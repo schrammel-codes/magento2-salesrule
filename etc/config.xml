@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <schrammelcodes_salesrule>
+            <duplication>
+                <duplicate_active_status>2</duplicate_active_status>
+                <copy_website_ids>1</copy_website_ids>
+                <copy_customer_group_ids>1</copy_customer_group_ids>
+                <copy_store_labels>1</copy_store_labels>
+            </duplication>
+        </schrammelcodes_salesrule>
+    </default>
+</config>

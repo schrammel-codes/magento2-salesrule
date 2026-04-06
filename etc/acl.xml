@@ -10,6 +10,13 @@
                         </resource>
                     </resource>
                 </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="SchrammelCodes_SalesRule::config" title="SchrammelCodes Sales Rule Configuration" sortOrder="10"/>
+                        </resource>
+                    </resource>
+                </resource>
             </resource>
         </resources>
     </acl>

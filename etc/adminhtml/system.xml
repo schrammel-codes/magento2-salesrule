@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="schrammelcodes" translate="label" sortOrder="400">
+            <label>SchrammelCodes</label>
+        </tab>
+        <section id="schrammelcodes_salesrule" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Sales Rule</label>
+            <tab>schrammelcodes</tab>
+            <resource>SchrammelCodes_SalesRule::config</resource>
+            <group id="duplication" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Duplication Settings</label>
+                <field id="duplicate_active_status" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Duplicate Active Status</label>
+                    <comment>Controls the active/inactive status of duplicated rules.</comment>
+                    <source_model>SchrammelCodes\SalesRule\Model\Config\Source\DuplicateActiveStatus</source_model>
+                </field>
+                <field id="copy_website_ids" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Copy Website Associations</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="copy_customer_group_ids" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Copy Customer Group Associations</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="copy_store_labels" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Copy Store Labels</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="custom_fields" translate="label comment" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Custom Fields to Reset on Duplication</label>
+                    <comment>Add database column names from the salesrule table that should be reset when a rule is duplicated. Leave "Reset Value" empty to set the field to NULL.</comment>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <frontend_model>SchrammelCodes\SalesRule\Block\Adminhtml\Config\Form\Field\CustomFields</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
