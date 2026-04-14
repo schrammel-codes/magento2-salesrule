@@ -33,7 +33,9 @@ class RuleDuplicator implements RuleDuplicatorInterface
         $newRule = $this->ruleFactory->create();
         $data = $originalRule->getData();
 
+        $duplicatedFrom = $originalRule->getData($this->ruleResource->getLinkField());
         $this->resetDuplicateFields($data);
+        $data['duplicated_from'] = $duplicatedFrom;
         $newRule->setData($data);
         $this->copyRelationships($originalRule, $newRule);
         $this->ruleResource->save($newRule);

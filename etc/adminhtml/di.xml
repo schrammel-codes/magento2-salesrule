@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="SchrammelCodes\SalesRule\Api\RuleDuplicatorInterface" type="SchrammelCodes\SalesRule\Model\RuleDuplicator"/>
+    <type name="Magento\SalesRule\Model\Rule\DataProvider">
+        <plugin name="schrammelcodes_salesrule_duplicated_from_data" type="SchrammelCodes\SalesRule\Plugin\Rule\DataProviderPlugin"/>
+    </type>
 </config>

@@ -615,6 +615,59 @@ class RuleDuplicatorTest extends TestCase
         $ruleDuplicator->duplicate($originalRule);
     }
 
+    public function testDuplicateSetsLinkFieldValueAsDuplicatedFromOnOpenSource(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator();
+
+        $originalRule = $this->createOriginalRule();
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+        $this->ruleResource->method('getLinkField')->willReturn('rule_id');
+
+        $capturedData = null;
+        $newRule->expects($this->once())
+            ->method('setData')
+            ->willReturnCallback(function ($data) use (&$capturedData, $newRule) {
+                $capturedData = $data;
+
+                return $newRule;
+            });
+
+        $ruleDuplicator->duplicate($originalRule);
+
+        $this->assertEquals(123, $capturedData['duplicated_from']);
+    }
+
+    public function testDuplicateSetsRowIdAsDuplicatedFromOnCommerce(): void
+    {
+        $ruleDuplicator = $this->getRuleDuplicator(stagingEnabled: true);
+
+        $originalRule = $this->createOriginalRule(['row_id' => 42]);
+        $newRule = $this->createNewRule();
+
+        $this->ruleFactory->method('create')->willReturn($newRule);
+        $this->ruleResource->method('save')->willReturnSelf();
+        $this->ruleResource->method('load')->willReturnSelf();
+        $this->ruleResource->method('getLinkField')->willReturn('row_id');
+        $newRule->method('getStoreLabels')->willReturn([]);
+
+        $capturedData = null;
+        $newRule->expects($this->once())
+            ->method('setData')
+            ->willReturnCallback(function ($data) use (&$capturedData, $newRule) {
+                $capturedData = $data;
+
+                return $newRule;
+            });
+
+        $ruleDuplicator->duplicate($originalRule);
+
+        $this->assertEquals(42, $capturedData['duplicated_from']);
+    }
+
     private function getRuleDuplicator(
         array $customFieldResets = [],
         bool $shouldCopyWebsiteIds = true,
@@ -653,7 +706,7 @@ class RuleDuplicatorTest extends TestCase
             ->onlyMethods(['getData', 'getWebsiteIds', 'getCustomerGroupIds', 'getStoreLabels'])
             ->getMock();
 
-        $rule->method('getData')->willReturn(array_merge([
+        $data = array_merge([
             'rule_id' => 123,
             'name' => 'Test Rule',
             'description' => 'Test Description',
@@ -666,7 +719,11 @@ class RuleDuplicatorTest extends TestCase
             'actions_serialized' => 'serialized_actions',
             'discount_amount' => 10.00,
             'simple_action' => 'by_percent',
-        ], $extraData));
+        ], $extraData);
+
+        $rule->method('getData')->willReturnCallback(
+            fn(?string $key = null) => $key === null ? $data : ($data[$key] ?? null)
+        );
 
         $rule->method('getWebsiteIds')->willReturn([1, 2, 3]);
         $rule->method('getCustomerGroupIds')->willReturn([0, 1, 2]);

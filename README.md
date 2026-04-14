@@ -48,6 +48,10 @@ When you duplicate a rule, the module:
 
 This ensures your duplicated rules are ready to customize without inheriting usage history or active date ranges.
 
+#### Traceability
+
+Duplicated rules display a read-only **"Duplicated From"** hint on their edit page, showing the ID of the original rule. On Adobe Commerce installations, both the rule ID and the staging row ID of the original rule are shown.
+
 ## Benefits for Store Administrators
 
 ### Time Savings

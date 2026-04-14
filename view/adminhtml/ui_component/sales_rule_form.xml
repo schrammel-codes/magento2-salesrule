@@ -5,4 +5,23 @@
             <button name="duplicate" class="SchrammelCodes\SalesRule\Block\Adminhtml\Promo\Quote\Edit\DuplicateButton"/>
         </buttons>
     </settings>
+    <fieldset name="rule_information">
+        <field name="duplicated_from"
+               formElement="input"
+               sortOrder="1"
+               component="SchrammelCodes_SalesRule/js/form/element/duplicated-from">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Duplicated From</label>
+                <dataScope>duplicated_from</dataScope>
+                <disabled>true</disabled>
+                <visible>false</visible>
+            </settings>
+        </field>
+    </fieldset>
 </form>
